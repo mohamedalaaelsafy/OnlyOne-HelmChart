@@ -1,0 +1,31 @@
+{{- if .Values.service }}
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Values.namespace | lower }}
+  name: {{ .Values.serviceName }}-svc
+  labels:
+    app: {{ .Values.serviceName }}
+  {{- if .Values.service.labels }}
+    {{- toYaml .Values.service.labels | nindent 4 }}
+  {{- end }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ .Values.serviceName }}
+  type: {{ .Values.service.type | default  "ClusterIP"}}
+  ports:
+  {{- range  $value := .Values.service.ports }}
+    - protocol: {{ ($value.protocol | quote ) | default "TCP" }}
+      name: {{ $value.name }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.targetPort }}
+  {{- end }}
+---
+{{- end }}
+
+
+

@@ -1,0 +1,57 @@
+{{- if .Values.deployment }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.serviceName }}
+  namespace: {{ .Values.namespace | lower }}
+  labels:
+    app: {{ .Values.serviceName }}
+spec:
+  replicas: {{ .Values.replicaCount | default  "1" }}
+  selector:
+    matchLabels:
+      app: {{ .Values.serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.serviceName }}
+    spec:
+      nodeSelector:
+        type: {{ .Values.serviceName }}
+      containers:
+      - image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+        imagePullPolicy: {{ .Values.deployment.pullPolicy | default  "Always"}}
+        name: {{ .Values.serviceName }}
+        {{- if .Values.deployment.env }}
+        env:
+        {{- range $value := .Values.deployment.env }}
+        - name: {{ $value.name }}
+          value: {{ $value.value }}
+        {{- end }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.deployment.port }}
+          name: {{ .Values.serviceName }}
+        volumeMounts:
+        {{- range $value := .Values.deployment.volumeMounts }}
+        - name: {{ $value.name }}
+          mountPath: {{ $value.mountPath }}
+          subPath: {{ $value.subPath }}
+        {{- end }}    
+      restartPolicy: {{ .Values.deployment.restartPolicy | default  "Always"}}
+      serviceAccountName: {{ .Values.appName }}-{{ .Values.environment }}                
+      volumes:
+        {{- range $value := .Values.deployment.volumes }}
+        - name: {{ $value.name }}
+        {{- if $value.secret }}
+          secret:
+            secretName: {{ $value.secret.secretName }}
+        {{- else if $value.configMap }}
+          configMap:
+            name: {{ $value.configMap.name }}
+        {{- else if $value.emptyDir }}
+          emptyDir: {{ $value.emptyDir }}
+        {{- end }}   
+        {{- end }}
+---
+{{- end }}

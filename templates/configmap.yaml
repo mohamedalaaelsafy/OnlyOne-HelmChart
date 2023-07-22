@@ -1,0 +1,66 @@
+{{- if .Values.configMap }}
+{{- range $value := .Values.configMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ $.Values.namespace | lower }}
+  name: {{ $value.name }}
+data:
+{{- if and ( eq ($value.type) "app" ) ( ne ($value.type | toString ) "<nil>" )  }}
+  app.conf: |
+   server {
+    listen 80;
+    root   /usr/share/nginx/html;
+
+    location / {
+      try_files $uri $uri/ /index.html$is_args$args;
+      index  index.html index.htm;
+      include  /etc/nginx/mime.types;
+      add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
+      }
+   }
+{{- else if and ( eq ($value.type) "nginx" ) ( ne ($value.type | toString ) "<nil>" ) }}
+data:
+  nginx.conf: |
+   load_module /usr/local/nginx/modules/ngx_http_headers_more_filter_module.so;
+
+   user  nginx;
+   worker_processes  auto;
+   
+   error_log  /var/log/nginx/error.log warn;
+   pid        /var/run/nginx.pid;
+   
+   
+   events {
+       worker_connections  1024;
+   }
+   
+   
+   http {
+   
+       more_clear_headers 'Server';
+       more_clear_headers 'X-Powered-By';
+   
+       server_tokens off;
+   
+       include       /etc/nginx/mime.types;
+       default_type  application/octet-stream;
+   
+       log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                         '$status $body_bytes_sent "$http_referer" '
+                         '"$http_user_agent" "$http_x_forwarded_for"';
+   
+       access_log  /var/log/nginx/access.log  main;
+   
+   
+       sendfile        on;
+       #tcp_nopush     on;
+   
+       keepalive_timeout  65;
+   
+       include /etc/nginx/conf.d/*.conf;
+   } 
+{{- end }}
+---
+{{- end }}
+{{- end }}

@@ -1,0 +1,79 @@
+global:
+  namespace:
+  serviceName:
+  appName:
+  env:
+  clusterIssuer: #for cert-manager
+
+
+
+secrets:
+  - name:
+    refreshInterval:
+    type:
+    secretStoreRef:
+      kind:
+      name:
+    data:
+    - secretKey:
+      remoteRef:
+        key:
+        property:
+
+configMap:
+  - type:
+    name:
+  - type:
+    name:
+
+
+deployment:
+  image:
+  tag:
+  replicaCount:
+  port:
+  imagePullPolicy:
+  restartPolicy:
+  volumeMounts:
+  - name:
+    mountPath:
+    subPath:
+  - name:
+    mountPath:
+    subPath:
+  - name:
+    mountPath:
+    subPath:
+  volumes:
+  - name:
+    configMap:
+      name:
+  - name:
+    configMap:
+      name:
+  - name:
+    secret:
+      secretName:
+  - name:
+    emptyDir:
+
+service:
+  annotations:
+  labels:
+  type:
+  ports:
+  - protocol:
+    name:
+    port:
+    targetPort:
+
+ingress:
+- hostName:
+  name:
+  annotations:
+  creatCert:
+  redirect:
+  secretName:
+  port:
+  paths:
+  - /
