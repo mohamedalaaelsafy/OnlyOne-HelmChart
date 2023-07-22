@@ -1,11 +1,10 @@
 global:
   namespace:
+  project_id:
   serviceName:
   appName:
   env:
-  clusterIssuer: #for cert-manager
-
-
+  clusterIssuer:
 
 secrets:
   - name:
@@ -26,6 +25,16 @@ configMap:
   - type:
     name:
 
+pvc:
+  - name:
+    storageClassName:
+    accessModes:
+      - 
+    resources:
+      requests:
+        storage:
+
+statefulSet:
 
 deployment:
   image:
@@ -34,10 +43,24 @@ deployment:
   port:
   imagePullPolicy:
   restartPolicy:
+  tolerations:
+  - key:
+    operator:
+    value:
+    effect:
+  nodeSelector:
+    type:
+  command:
+  args:
+  startupProbe:
+    exec:
+      command:
+      - 
+  livenessProbe:
+    exec:
+      command:
+      - 
   volumeMounts:
-  - name:
-    mountPath:
-    subPath:
   - name:
     mountPath:
     subPath:
@@ -56,6 +79,9 @@ deployment:
       secretName:
   - name:
     emptyDir:
+  - name:
+    persistentVolumeClaim:
+        claimName:
 
 service:
   annotations:
@@ -71,9 +97,9 @@ ingress:
 - hostName:
   name:
   annotations:
-  creatCert:
+  creatCert: 
   redirect:
   secretName:
   port:
   paths:
-  - /
+  - 

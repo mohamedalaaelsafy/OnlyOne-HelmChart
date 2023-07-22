@@ -1,6 +1,6 @@
-{{- if .Values.deployment }}
+{{- if .Values.statefulSet }}
 apiVersion: apps/v1
-kind: Deployment
+kind: statefulSet
 metadata:
   name: {{ .Values.serviceName }}
   namespace: {{ .Values.namespace | lower }}
@@ -16,66 +16,66 @@ spec:
       labels:
         app: {{ .Values.serviceName }}
     spec:
-      {{- if .Values.deployment.tolerations }}
+      {{- if .Values.statefulSet.tolerations }}
       tolerations:
-      {{- range $value := .Values.deployment.tolerations }}
+      {{- range $value := .Values.statefulSet.tolerations }}
       - key: {{ $value.key }}
         operator: {{ $value.operator }}
         value: {{ $value.value }}
         effect: {{ $value.effect }}
       {{- end }}
       {{- end }}
-      {{- if .Values.deployment.nodeSelector }}
+      {{- if .Values.statefulSet.nodeSelector }}
       nodeSelector:
-        type: {{ .Values.deployment.nodeSelector.type }}
+        type: {{ .Values.statefulSet.nodeSelector.type }}
       {{- end }}
       containers:
-      - image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
-        imagePullPolicy: {{ .Values.deployment.pullPolicy | default  "Always"}}
+      - image: {{ .Values.statefulSet.image }}:{{ .Values.statefulSet.tag }}
+        imagePullPolicy: {{ .Values.statefulSet.pullPolicy | default  "Always"}}
         name: {{ .Values.serviceName }}
-        {{- if .Values.deployment.command }}
-        command: {{ .Values.deployment.command }}
+        {{- if .Values.statefulSet.command }}
+        command: {{ .Values.statefulSet.command }}
         {{- end }}
-        {{- if .Values.deployment.args }}
-        args: {{ .Values.deployment.args }}
+        {{- if .Values.statefulSet.args }}
+        args: {{ .Values.statefulSet.args }}
         {{- end }}
-        {{- if .Values.deployment.startupProbe }}
+        {{- if .Values.statefulSet.startupProbe }}
         startupProbe:
           exec:
             command:
-            {{- range $value := .Values.deployment.startupProbe.exec.command }}
+            {{- range $value := .Values.statefulSet.startupProbe.exec.command }}
             - {{ $value }}
             {{- end }}
           initialDelaySeconds: 30
         {{- end }}
-        {{- if .Values.deployment.livenessProbe }}
+        {{- if .Values.statefulSet.livenessProbe }}
         readinessProbe:
           exec:
             command:
-            {{- range $value := .Values.deployment.livenessProbe.exec.command }}
+            {{- range $value := .Values.statefulSet.livenessProbe.exec.command }}
             - {{ $value }}
             {{- end }}
         {{- end }}
-        {{- if .Values.deployment.env }}
+        {{- if .Values.statefulSet.env }}
         env:
-        {{- range $value := .Values.deployment.env }}
+        {{- range $value := .Values.statefulSet.env }}
         - name: {{ $value.name }}
           value: {{ $value.value }}
         {{- end }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.deployment.port }}
+        - containerPort: {{ .Values.statefulSet.port }}
           name: {{ .Values.serviceName }}
         volumeMounts:
-        {{- range $value := .Values.deployment.volumeMounts }}
+        {{- range $value := .Values.statefulSet.volumeMounts }}
         - name: {{ $value.name }}
           mountPath: {{ $value.mountPath }}
           subPath: {{ $value.subPath }}
         {{- end }}    
-      restartPolicy: {{ .Values.deployment.restartPolicy | default  "Always"}}
+      restartPolicy: {{ .Values.statefulSet.restartPolicy | default  "Always"}}
       serviceAccountName: {{ .Values.appName }}-{{ .Values.environment }}                
       volumes:
-        {{- range $value := .Values.deployment.volumes }}
+        {{- range $value := .Values.statefulSet.volumes }}
         - name: {{ $value.name }}
         {{- if $value.secret }}
           secret:
