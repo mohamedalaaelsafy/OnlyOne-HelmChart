@@ -1,105 +1,72 @@
-global:
-  namespace:
-  project_id:
-  serviceName:
-  appName:
-  env:
-  clusterIssuer:
-
 secrets:
+  - name:
+    refreshInterval:
+    secretStoreRef:
+      kind:
+      name:
+    target:
+      name:
+    data:
+    - secretKey:
+      remoteRef:
+        key:
   - name:
     refreshInterval:
     type:
     secretStoreRef:
       kind:
       name:
+    target:
+      name:
     data:
     - secretKey:
       remoteRef:
         key:
         property:
-
-configMap:
-  - type:
-    name:
-  - type:
-    name:
-
-pvc:
-  - name:
-    storageClassName:
-    accessModes:
-      - 
-    resources:
-      requests:
-        storage:
-
-statefulSet:
+    - secretKey:
+      remoteRef:
+        key:
+        property:
 
 deployment:
+  annotations:
   image:
   tag:
   replicaCount:
   port:
-  imagePullPolicy:
   restartPolicy:
-  tolerations:
-  - key:
-    operator:
-    value:
-    effect:
-  nodeSelector:
-    type:
-  command:
-  args:
-  startupProbe:
-    exec:
-      command:
-      - 
-  livenessProbe:
-    exec:
-      command:
-      - 
-  volumeMounts:
+  serviceAccountName:
+  env:
   - name:
-    mountPath:
-    subPath:
+    value:
+  - name:
+    value:
+  volumeMounts:
   - name:
     mountPath:
     subPath:
   volumes:
   - name:
-    configMap:
-      name:
-  - name:
-    configMap:
-      name:
-  - name:
     secret:
       secretName:
-  - name:
-    emptyDir:
-  - name:
-    persistentVolumeClaim:
-        claimName:
 
 service:
   annotations:
+  name:
   labels:
   type:
   ports:
   - protocol:
-    name:
     port:
-    targetPort:
 
 ingress:
 - hostName:
-  name:
-  annotations:
-  creatCert: 
-  redirect:
-  secretName:
-  port:
+  tls:
+    enabled:
+    redirect:
+    type:
+    secretName:
   paths:
-  - 
+    - 
+
+
