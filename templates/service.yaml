@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   namespace: {{ .Values.namespace | lower }}
-  name: {{ .Values.serviceName }}-svc
+  name: {{ .Values.service.name }}
   labels:
     app: {{ .Values.serviceName }}
   {{- if .Values.service.labels }}
@@ -19,13 +19,10 @@ spec:
   type: {{ .Values.service.type | default  "ClusterIP"}}
   ports:
   {{- range  $value := .Values.service.ports }}
-    - protocol: {{ ($value.protocol | quote ) | default "TCP" }}
-      name: {{ $value.name }}
+    - protocol: {{ ($value.protocol) | default "TCP" }}
+      name: {{ $.Values.serviceName }}
       port: {{ $value.port }}
-      targetPort: {{ $value.targetPort }}
+      targetPort: {{ $value.port }}
   {{- end }}
 ---
 {{- end }}
-
-
-

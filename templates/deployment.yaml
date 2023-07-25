@@ -6,6 +6,10 @@ metadata:
   namespace: {{ .Values.namespace | lower }}
   labels:
     app: {{ .Values.serviceName }}
+    {{- if .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml .Values.deployment.annotations | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.replicaCount | default  "1" }}
   selector:
@@ -48,11 +52,11 @@ spec:
             {{- end }}
           initialDelaySeconds: 30
         {{- end }}
-        {{- if .Values.deployment.livenessProbe }}
+        {{- if .Values.deployment.readinessProbe }}
         readinessProbe:
           exec:
             command:
-            {{- range $value := .Values.deployment.livenessProbe.exec.command }}
+            {{- range $value := .Values.deployment.readinessProbe.exec.command }}
             - {{ $value }}
             {{- end }}
         {{- end }}
@@ -66,6 +70,7 @@ spec:
         ports:
         - containerPort: {{ .Values.deployment.port }}
           name: {{ .Values.serviceName }}
+      {{- if and (.Values.deployment.volumeMounts) (.Values.deployment.volumes) }}
         volumeMounts:
         {{- range $value := .Values.deployment.volumeMounts }}
         - name: {{ $value.name }}
@@ -73,7 +78,9 @@ spec:
           subPath: {{ $value.subPath }}
         {{- end }}    
       restartPolicy: {{ .Values.deployment.restartPolicy | default  "Always"}}
-      serviceAccountName: {{ .Values.appName }}-{{ .Values.environment }}                
+      {{- if .Values.deployment.serviceAccountName }}
+      serviceAccountName: {{ .Values.appName }}-{{ .Values.environment }} 
+      {{- end }}               
       volumes:
         {{- range $value := .Values.deployment.volumes }}
         - name: {{ $value.name }}
@@ -90,5 +97,6 @@ spec:
             claimName: {{ $value.persistentVolumeClaim.claimName }}
         {{- end }}   
         {{- end }}
+      {{- end }}
 ---
 {{- end }}

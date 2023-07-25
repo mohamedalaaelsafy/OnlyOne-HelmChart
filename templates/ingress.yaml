@@ -9,13 +9,18 @@ metadata:
     {{- if $value.annotations }}
     {{- toYaml $value.annotations | nindent 4 }}
     {{- end }}
-    {{- if and ( eq ($value.creatCert) true ) ( ne ($value.creatCert | toString ) "<nil>" )  }}
+    {{- if and ( $value.tls ) ( $value.tls.enabled ) ( $value.tls.type ) }}
+    {{- if and ( eq ($value.tls.enabled ) true  ) ( eq ($value.tls.type ) "auto" ) ( ne ($value.tls.enabled | toString ) "<nil>" )  }}
     cert-manager.io/cluster-issuer: {{ $.Values.clusterIssuer }}
-    nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$http_host$request_uri
-    nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth  
     certmanager.k8s.io/acme-challenge-type: http01
     {{- end }}
-    {{- if and ( eq ($value.redirect) true ) ( ne ($value.redirect | toString ) "<nil>" )  }}
+    {{- if and ( eq ($value.tls.oauth_enabled ) true  ) ( ne ($value.tls.oauth_enabled | toString ) "<nil>" )  }}
+    nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$http_host$request_uri
+    nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth  
+    {{- end }}
+ 
+    {{- end }}
+    {{- if and ( eq ($value.tls.redirect) true ) ( ne ($value.tls.redirect | toString ) "<nil>" )  }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
     {{- end }}
@@ -35,16 +40,18 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ default $.Values.serviceName }}-svc
+                name: {{ default $.Values.service.name }}
                 port:
+                  number:  {{ $.Values.deployment.port }} 
         {{- end }}      
-                  number:  {{ $value.port }}
-
-  {{- if and ( eq ($value.creatCert) true ) ( ne ($value.creatCert | toString ) "<nil>" )  }}
+              
+  {{- if and ( eq ($value.tls.enabled ) true  ) ( ne ($value.tls.enabled | toString ) "<nil>" )  }}
+  {{- if or ( eq ($value.tls.type ) "auto"  )  ( eq ($value.tls.type ) "manual"  ) }}
   tls:
     - hosts:
         - {{ $value.hostName }}
-      secretName: {{- if  $value.secretName }} {{ $value.secretName }} {{- else }} {{ $.Values.serviceName }}-tls-cert {{- end }}
+      secretName: {{- if  $value.tls.secretName }} {{ $value.tls.secretName }} {{- else }} {{ $.Values.serviceName }}-crt-secret {{- end }}
+  {{- end }}
   {{- end }}
 ---
 {{- end }}
